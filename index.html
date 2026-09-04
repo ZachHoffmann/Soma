@@ -121,13 +121,13 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 30px 0 20px;
+      padding: 24px 0 16px;
     }
 
     .circle-wrap {
       position: relative;
-      width: 180px;
-      height: 180px;
+      width: 210px;
+      height: 210px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -135,8 +135,8 @@
 
     .breath-ring {
       position: absolute;
-      width: 85px;
-      height: 85px;
+      width: 140px;
+      height: 140px;
       border-radius: 50%;
       background: var(--sage-soft);
       border: 2px solid var(--sage);
@@ -146,10 +146,12 @@
 
     .timer-readout {
       position: relative;
-      font-size: 2.1rem;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      font-weight: 300;
-      letter-spacing: 0.05em;
+      font-size: 1.75rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      z-index: 2;
     }
 
     .cue-text {
@@ -297,6 +299,7 @@
       margin-left: auto;
     }
 
+    /* Relief Steps */
     .relief-step {
       display: flex;
       gap: 12px;
@@ -446,27 +449,62 @@
 
   <!-- TAB 3: ACUTE RELIEF -->
   <section id="tab-relief" class="tab-content">
+    <!-- Tool 1: Physiological Sigh -->
     <div class="card">
-      <div class="card-title">The Physiological Sigh</div>
-      <div class="subtext">Use when butterflies, nausea, or sudden heat hit. Two nasal inhales followed by one prolonged mouth sigh.</div>
+      <div class="card-title">1. The Physiological Sigh</div>
+      <div class="subtext">Rapidly down-regulates autonomic arousal when heart rate spikes or panic loops begin.</div>
 
       <div class="relief-step">
         <div class="step-num">1</div>
-        <div>Take a deep nasal breath filling ~80% of your lungs.</div>
+        <div>Deep nasal breath filling ~80% capacity.</div>
       </div>
       <div class="relief-step">
         <div class="step-num">2</div>
-        <div>Without exhaling, take a second sharp "sip" of air to fully expand alveoli.</div>
+        <div>Second sharp "sip" of air to fully reinflate lung alveoli.</div>
       </div>
       <div class="relief-step">
         <div class="step-num">3</div>
-        <div>Release a slow, soft sigh through your mouth until your lungs are completely empty.</div>
+        <div>Long, unforced mouth sigh until lungs are completely empty.</div>
       </div>
 
-      <div style="margin-top: 20px; text-align: center;">
+      <div style="margin-top: 18px; text-align: center;">
         <button class="action-btn btn-primary" style="max-width: 220px;" onclick="runPacedSigh()">Guide 3 Sighs</button>
       </div>
       <div id="sighFeedback" style="text-align:center; margin-top:10px; font-size:0.9rem; color:var(--sage); min-height:1.2em;"></div>
+    </div>
+
+    <!-- Tool 2: Abdominal Unclamping -->
+    <div class="card">
+      <div class="card-title">2. Abdominal Unclamping (Gut Release)</div>
+      <div class="subtext">Use when feeling butterflies, stomach flips, or nausea. Releases somatic muscular constriction around the celiac (solar) plexus.</div>
+
+      <div class="relief-step">
+        <div class="step-num">1</div>
+        <div><strong>Hand to Navel:</strong> Place one flat hand directly over your lower stomach. Notice if your core muscles are gripping inward.</div>
+      </div>
+      <div class="relief-step">
+        <div class="step-num">2</div>
+        <div><strong>Drop the Guard:</strong> Consciously soften your belly completely outward into your hand. Un-clench your jaw and let your tongue fall from the roof of your mouth.</div>
+      </div>
+      <div class="relief-step">
+        <div class="step-num">3</div>
+        <div><strong>Slow Belly Expansions:</strong> Take 3 slow nasal breaths where only your belly pushes your hand out. Chest and shoulders stay completely still.</div>
+      </div>
+    </div>
+
+    <!-- Tool 3: Cold Thermal Reset -->
+    <div class="card">
+      <div class="card-title">3. Cold Thermal Reset (Dive Reflex)</div>
+      <div class="subtext">Use when feeling sudden heat, hot flashes, or acute cognitive overwhelm.</div>
+
+      <div class="relief-step">
+        <div class="step-num">1</div>
+        <div>Run cold tap water over the insides of both wrists for 30–60 seconds, or press a cold damp towel across your forehead and eyes.</div>
+      </div>
+      <div class="relief-step">
+        <div class="step-num">2</div>
+        <div>The sudden temperature shift activates trigeminal nerve receptors, triggering the mammalian dive reflex to drop heart rate immediately.</div>
+      </div>
     </div>
   </section>
 
@@ -554,10 +592,12 @@
       const ring = document.getElementById('breathRing');
       const cue = document.getElementById('cueText');
       
+      // Inhale: 4s - expand to scale(1.4) [approx 196px]
       cue.innerText = 'Inhale smoothly (Belly rises)';
       ring.style.transition = 'transform 4s ease-in-out';
-      ring.style.transform = 'scale(1.9)';
+      ring.style.transform = 'scale(1.4)';
 
+      // Exhale: 8s - return smoothly to base scale(1) [140px]
       setTimeout(() => {
         if (!isRunning) return;
         cue.innerText = 'Exhale softly (Belly falls)';
@@ -645,7 +685,7 @@
       setTimeout(() => notice.innerText = '', 1500);
     }
 
-    // --- IndexedDB for Persistent Offline Audio Storage ---
+    // IndexedDB for Persistent Audio Storage
     let db = null;
     const DB_NAME = 'SomaAudioDB';
     const DB_VERSION = 1;
@@ -733,7 +773,6 @@
       }
     }
 
-    // Check existing stored files on startup
     async function checkSavedTracks() {
       const tracks = ['track1', 'track2', 'track3', 'track4'];
       for (const t of tracks) {
