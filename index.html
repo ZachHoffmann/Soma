@@ -9,125 +9,173 @@
   <meta name="apple-mobile-web-app-title" content="Soma" />
   <style>
     :root {
-      --bg: #f4efe6;
-      --card: #e9e2d5;
-      --card-border: #dcd3c3;
-      --text: #2f2a24;
-      --text-muted: #736b60;
-      --sage: #6b7f6e;
-      --sage-soft: #dbe3dc;
-      --clay: #a67c68;
-      --sand: #dfd5c4;
+      /* Refined Warm Organic Palette */
+      --bg: #f5f1ea;
+      --card: #f9f6f0;
+      --card-border: #e6dfd3;
+      
+      --text: #322d26;
+      --text-muted: #787165;
+      
+      --sage: #6b7d6e;
+      --sage-dark: #586a5b;
+      --sage-soft: #dbe2dc;
+      
+      --clay: #b08470;
+      
+      --sand: #e6dfd1;
+      --sand-hover: #d7d0c0;
+      
+      --danger: #b86f65;
+
+      /* Radii & Elevations */
+      --radius-sm: 12px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --shadow-sm: 0 4px 12px rgba(47, 42, 36, 0.03), 0 1px 3px rgba(47, 42, 36, 0.02);
+      --shadow-md: 0 8px 24px rgba(47, 42, 36, 0.04), 0 2px 8px rgba(47, 42, 36, 0.02);
+      
+      /* System Typography */
+      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, sans-serif;
+      --font-serif: ui-serif, "Charter", "Georgia", serif;
     }
 
-    * {
+    *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Charter", "Georgia", serif;
       -webkit-tap-highlight-color: transparent;
     }
 
     body {
       background-color: var(--bg);
       color: var(--text);
+      font-family: var(--font-sans);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      padding: env(safe-area-inset-top, 24px) 16px env(safe-area-inset-bottom, 24px) 16px;
+      padding: env(safe-area-inset-top, 24px) 16px env(safe-area-inset-bottom, 32px) 16px;
       overflow-x: hidden;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    input, textarea, button {
+      font-family: inherit;
     }
 
     header {
       text-align: center;
-      padding: 16px 0 12px;
+      padding: 16px 0 20px;
     }
 
     h1 {
-      font-size: 1.7rem;
+      font-family: var(--font-serif);
+      font-size: 1.85rem;
       font-weight: 500;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.15em;
       color: var(--text);
+      font-style: italic;
+      margin-left: 0.15em; /* Optical centering for letter-spacing */
     }
 
+    /* --- Navigation --- */
     .nav-bar {
       display: flex;
       background: var(--card);
       border: 1px solid var(--card-border);
       border-radius: 20px;
-      padding: 4px;
-      margin: 8px auto 20px;
-      max-width: 420px;
+      padding: 5px;
+      margin: 4px auto 28px;
+      max-width: 440px;
       width: 100%;
+      box-shadow: inset 0 2px 4px rgba(47, 42, 36, 0.015);
     }
 
     .nav-btn {
       flex: 1;
       border: none;
-      background: none;
-      padding: 10px 4px;
+      background: transparent;
+      padding: 12px 4px;
       font-size: 0.85rem;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-weight: 500;
       color: var(--text-muted);
       border-radius: 16px;
-      transition: all 0.25s ease;
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
       cursor: pointer;
+      letter-spacing: -0.01em;
+      touch-action: manipulation;
+    }
+
+    .nav-btn:active {
+      transform: scale(0.96);
     }
 
     .nav-btn.active {
       background: var(--bg);
       color: var(--text);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px rgba(47, 42, 36, 0.06), 0 1px 2px rgba(47, 42, 36, 0.03);
+      font-weight: 600;
     }
 
+    /* --- Layout & Cards --- */
     .tab-content {
       display: none;
       max-width: 440px;
       width: 100%;
       margin: 0 auto;
       flex-direction: column;
-      gap: 18px;
+      gap: 20px;
+      padding-bottom: 24px;
     }
 
     .tab-content.active {
       display: flex;
+      animation: fadeSlideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .card {
       background: var(--card);
       border: 1px solid var(--card-border);
-      border-radius: 18px;
-      padding: 20px;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
     }
 
     .card-title {
-      font-size: 1.05rem;
+      font-family: var(--font-serif);
+      font-size: 1.2rem;
       font-weight: 600;
       margin-bottom: 8px;
       color: var(--text);
+      letter-spacing: -0.01em;
     }
 
     .subtext {
-      font-size: 0.88rem;
+      font-size: 0.92rem;
       color: var(--text-muted);
-      line-height: 1.45;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
     }
 
-    /* Breath Circle */
+    /* --- Breath Visualizer --- */
     .visualizer-box {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 24px 0 16px;
+      padding: 32px 0 24px;
     }
 
     .circle-wrap {
       position: relative;
-      width: 210px;
-      height: 210px;
+      width: 220px;
+      height: 220px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -138,267 +186,362 @@
       width: 140px;
       height: 140px;
       border-radius: 50%;
-      background: var(--sage-soft);
-      border: 2px solid var(--sage);
+      background: linear-gradient(135deg, var(--sage-soft), #e4ebe5);
+      border: 1px solid rgba(255, 255, 255, 0.5);
       transform: scale(1);
       transition: transform 0.1s linear;
+      box-shadow: 0 8px 24px rgba(107, 127, 110, 0.15), inset 0 2px 12px rgba(255, 255, 255, 0.6);
+      z-index: 1;
     }
 
     .timer-readout {
       position: relative;
-      font-size: 1.75rem;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-weight: 400;
-      letter-spacing: 0.04em;
+      font-size: 2.25rem;
+      font-weight: 300;
+      letter-spacing: 0.02em;
       color: var(--text);
       z-index: 2;
+      font-variant-numeric: tabular-nums;
     }
 
     .cue-text {
-      margin-top: 14px;
+      margin-top: 24px;
       font-size: 0.95rem;
-      color: var(--text-muted);
-      min-height: 1.4em;
+      font-weight: 500;
+      color: var(--sage);
+      min-height: 1.5em;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      transition: opacity 0.3s ease;
     }
 
-    /* Controls */
+    /* --- Controls & Inputs --- */
     .time-selector {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin: 16px 0;
+      margin: 16px 0 24px;
       background: var(--bg);
-      padding: 10px 14px;
-      border-radius: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
       border: 1px solid var(--card-border);
+      box-shadow: inset 0 2px 6px rgba(47, 42, 36, 0.02);
     }
 
     .time-selector label {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: var(--text-muted);
-      font-family: -apple-system, sans-serif;
+      font-weight: 500;
     }
 
     .slider {
       flex: 1;
-      accent-color: var(--sage);
+      -webkit-appearance: none;
+      background: transparent;
+      height: 24px; 
+    }
+    .slider:focus { outline: none; }
+    .slider::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      background: var(--card-border);
+      border-radius: 4px;
+    }
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 24px;
+      width: 24px;
+      border-radius: 50%;
+      background: var(--sage);
+      margin-top: -9px;
+      box-shadow: 0 2px 6px rgba(107, 127, 110, 0.3), inset 0 1px 2px rgba(255,255,255,0.2);
+      border: 1px solid var(--sage-dark);
+      cursor: pointer;
+      transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1);
+    }
+    .slider::-webkit-slider-thumb:active {
+      transform: scale(1.15);
     }
 
     .num-input {
-      width: 50px;
-      padding: 4px 6px;
-      border-radius: 8px;
+      width: 52px;
+      padding: 8px 4px;
+      border-radius: var(--radius-sm);
       border: 1px solid var(--card-border);
       background: var(--card);
       color: var(--text);
-      font-size: 0.95rem;
+      font-size: 16px !important; /* Critical: Prevents iOS auto-zoom */
+      font-weight: 600;
       text-align: center;
-      font-family: -apple-system, sans-serif;
+      box-shadow: inset 0 2px 4px rgba(47, 42, 36, 0.02);
+      transition: border-color 0.2s, background 0.2s;
+      -moz-appearance: textfield;
+      font-variant-numeric: tabular-nums;
+    }
+    .num-input::-webkit-outer-spin-button,
+    .num-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .num-input:focus {
+      outline: none;
+      border-color: var(--sage);
+      background: var(--bg);
     }
 
+    /* --- Buttons --- */
     .btn-row {
       display: flex;
-      gap: 10px;
+      gap: 12px;
     }
 
     .action-btn {
       flex: 1;
-      padding: 13px;
-      border-radius: 14px;
+      padding: 14px;
+      border-radius: var(--radius-md);
       border: none;
-      font-size: 0.95rem;
-      font-family: -apple-system, sans-serif;
-      font-weight: 500;
+      font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.2s;
+      letter-spacing: 0.02em;
+      touch-action: manipulation;
+    }
+
+    .action-btn:active, .journal-btn:active, .mini-btn:active { 
+      transform: scale(0.96); 
     }
 
     .btn-primary {
       background: var(--sage);
       color: #fff;
+      box-shadow: 0 4px 12px rgba(107, 127, 110, 0.2), inset 0 1px 1px rgba(255,255,255,0.1);
+    }
+    .btn-secondary { 
+      background: var(--sand); 
+      color: var(--text); 
+      box-shadow: 0 4px 12px rgba(47, 42, 36, 0.03), inset 0 1px 1px rgba(255,255,255,0.3);
     }
 
-    .btn-secondary {
-      background: var(--sand);
-      color: var(--text);
-    }
-
-    /* Journal */
+    /* --- Journal --- */
     textarea {
       width: 100%;
-      height: 85px;
+      height: 100px;
       border: 1px solid var(--card-border);
-      border-radius: 12px;
+      border-radius: var(--radius-md);
       background: var(--bg);
       color: var(--text);
-      padding: 12px;
-      font-size: 0.9rem;
+      padding: 16px;
+      font-size: 16px !important; /* Prevents iOS auto-zoom */
+      line-height: 1.5;
       resize: none;
-      margin-top: 10px;
-      font-family: -apple-system, sans-serif;
+      margin-top: 16px;
+      box-shadow: inset 0 2px 6px rgba(47, 42, 36, 0.02);
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      -webkit-appearance: none;
+    }
+    textarea::placeholder { color: #a8a094; }
+    textarea:focus { 
+      outline: none; 
+      border-color: var(--sage); 
+      background: var(--card);
+      box-shadow: inset 0 2px 6px rgba(47, 42, 36, 0.02), 0 0 0 3px var(--sage-soft); 
     }
 
     .journal-controls {
       display: flex;
-      gap: 10px;
-      margin-top: 10px;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 14px;
       align-items: center;
     }
 
     .journal-btn {
-      padding: 9px 15px;
-      border-radius: 10px;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
       border: none;
-      font-size: 0.85rem;
-      font-family: -apple-system, sans-serif;
+      font-size: 0.9rem;
       font-weight: 500;
       cursor: pointer;
+      transition: transform 0.15s, background-color 0.2s;
+      touch-action: manipulation;
+    }
+    .journal-btn.primary { background: var(--sage); color: #fff; box-shadow: 0 2px 8px rgba(107, 127, 110, 0.15); }
+    .journal-btn.secondary { background: var(--sand); color: var(--text); }
+
+    #saveNotice {
+      font-size: 0.85rem;
+      color: var(--sage);
+      font-weight: 500;
+      margin-left: auto;
     }
 
-    .journal-btn.primary {
-      background: var(--sage);
-      color: #fff;
-    }
-
-    .journal-btn.secondary {
-      background: var(--sand);
-      color: var(--text);
-    }
-
-    /* Past entries drawer */
     .entries-container {
       display: none;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 14px;
-      max-height: 280px;
+      gap: 12px;
+      margin-top: 20px;
+      max-height: 320px;
       overflow-y: auto;
-      padding-right: 4px;
+      padding-right: 6px;
     }
+    /* Scrollbars */
+    .entries-container::-webkit-scrollbar { width: 5px; }
+    .entries-container::-webkit-scrollbar-thumb { background-color: var(--card-border); border-radius: 4px; }
 
     .entry-card {
       background: var(--bg);
       border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 12px;
+      border-radius: var(--radius-md);
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
     }
-
     .entry-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.78rem;
-      font-family: -apple-system, sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
       color: var(--text-muted);
     }
-
     .entry-text {
-      font-size: 0.88rem;
-      line-height: 1.45;
-      font-family: -apple-system, sans-serif;
+      font-size: 0.95rem;
+      line-height: 1.55;
       color: var(--text);
       white-space: pre-wrap;
     }
-
     .delete-entry-btn {
-      background: none;
+      background: rgba(176, 132, 112, 0.1);
       border: none;
-      color: #9f5b53;
-      font-size: 0.78rem;
+      color: var(--clay);
+      font-size: 0.75rem;
+      font-weight: 600;
       cursor: pointer;
-      font-family: -apple-system, sans-serif;
-      padding: 2px 4px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      transition: background-color 0.2s;
+      touch-action: manipulation;
     }
+    .delete-entry-btn:active { background-color: rgba(176, 132, 112, 0.2); }
 
-    /* Audio Track Cards */
+    /* --- Audio Tracks --- */
     .track-card {
       background: var(--bg);
       border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 14px;
-      margin-top: 12px;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-top: 14px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 14px;
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.5), 0 2px 8px rgba(47, 42, 36, 0.02);
     }
-
     .track-info {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
     }
-
     .track-title {
-      font-size: 0.95rem;
+      font-size: 1rem;
       font-weight: 600;
-      font-family: -apple-system, sans-serif;
       color: var(--text);
+      margin-bottom: 4px;
     }
-
     .track-meta {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
+      font-weight: 500;
       color: var(--text-muted);
-      font-family: -apple-system, sans-serif;
     }
-
     .audio-actions {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       align-items: center;
     }
-
     .mini-btn {
-      padding: 7px 12px;
-      border-radius: 10px;
+      padding: 10px 14px;
+      border-radius: 12px;
       border: 1px solid var(--card-border);
       background: var(--card);
       color: var(--text);
-      font-size: 0.8rem;
-      font-family: -apple-system, sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
       cursor: pointer;
+      transition: transform 0.15s, background-color 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(47, 42, 36, 0.02);
+      touch-action: manipulation;
     }
-
-    .mini-btn.primary {
-      background: var(--sage);
-      color: #fff;
+    .mini-btn.primary { 
+      background: var(--sage); 
+      color: #fff; 
       border: none;
+      box-shadow: 0 2px 6px rgba(107, 127, 110, 0.2);
     }
-
+    
     .status-tag {
       font-size: 0.75rem;
-      font-family: -apple-system, sans-serif;
+      font-weight: 500;
       color: var(--text-muted);
       margin-left: auto;
+      background: rgba(228, 222, 203, 0.4);
+      padding: 6px 10px;
+      border-radius: 8px;
+    }
+    
+    audio {
+      width: 100%;
+      height: 44px;
+      margin-top: 6px;
+      border-radius: 12px;
+      outline: none;
+    }
+    audio::-webkit-media-controls-panel {
+      background-color: var(--sand);
     }
 
-    /* Relief Steps */
+    /* --- Relief Steps --- */
     .relief-step {
       display: flex;
-      gap: 12px;
-      margin-top: 10px;
+      gap: 16px;
+      margin-top: 18px;
       align-items: flex-start;
-      font-family: -apple-system, sans-serif;
-      font-size: 0.88rem;
-      line-height: 1.4;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: var(--text);
     }
-
     .step-num {
       background: var(--sand);
+      color: var(--text);
       border-radius: 50%;
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
+      font-weight: 600;
       flex-shrink: 0;
+      margin-top: 2px;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.4);
+    }
+
+    #sighFeedback {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--sage);
+      min-height: 1.5em;
     }
   </style>
 </head>
-<body>
+<!-- ontouchstart ensures snappy iOS CSS :active states exist instantly -->
+<body ontouchstart="">
 
   <header>
     <h1>s o m a</h1>
@@ -428,7 +571,7 @@
         <label for="timeSlider">Duration:</label>
         <input type="range" id="timeSlider" class="slider" min="1" max="60" value="5" oninput="syncTimer(this.value)" />
         <input type="number" id="timeBox" class="num-input" min="1" max="60" value="5" oninput="syncTimer(this.value)" />
-        <span style="font-size:0.85rem; color:var(--text-muted); font-family:-apple-system, sans-serif;">min</span>
+        <span style="font-size:0.85rem; color:var(--text-muted); font-weight:500;">min</span>
       </div>
 
       <div class="btn-row">
@@ -446,7 +589,7 @@
       <div class="journal-controls">
         <button class="journal-btn primary" onclick="submitJournalEntry()">Save Entry</button>
         <button class="journal-btn secondary" id="toggleEntriesBtn" onclick="togglePastEntries()">Past Entries (<span id="entryCount">0</span>)</button>
-        <div id="saveNotice" style="font-size:0.75rem; color:var(--text-muted); font-family:-apple-system, sans-serif;"></div>
+        <div id="saveNotice"></div>
       </div>
 
       <!-- Collapsible Past Entries Container -->
@@ -463,8 +606,10 @@
       <!-- Track 1 -->
       <div class="track-card" id="card-track1">
         <div class="track-info">
-          <div class="track-title">Ally Boothroyd • Sleep Descent</div>
-          <div class="track-meta">45 min</div>
+          <div>
+            <div class="track-title">Ally Boothroyd • Sleep Descent</div>
+            <div class="track-meta">45 min</div>
+          </div>
         </div>
         <div class="audio-actions">
           <button class="mini-btn primary" onclick="playTrack('track1')">Play</button>
@@ -474,14 +619,16 @@
           </label>
           <span class="status-tag" id="status-track1">Not linked</span>
         </div>
-        <audio id="audio-track1" controls style="width:100%; display:none; margin-top:6px;"></audio>
+        <audio id="audio-track1" controls style="display:none;"></audio>
       </div>
 
       <!-- Track 2 -->
       <div class="track-card" id="card-track2">
         <div class="track-info">
-          <div class="track-title">Huberman • 10m Daytime NSDR</div>
-          <div class="track-meta">10 min</div>
+          <div>
+            <div class="track-title">Huberman • 10m Daytime NSDR</div>
+            <div class="track-meta">10 min</div>
+          </div>
         </div>
         <div class="audio-actions">
           <button class="mini-btn primary" onclick="playTrack('track2')">Play</button>
@@ -491,14 +638,16 @@
           </label>
           <span class="status-tag" id="status-track2">Not linked</span>
         </div>
-        <audio id="audio-track2" controls style="width:100%; display:none; margin-top:6px;"></audio>
+        <audio id="audio-track2" controls style="display:none;"></audio>
       </div>
 
       <!-- Track 3 -->
       <div class="track-card" id="card-track3">
         <div class="track-info">
-          <div class="track-title">Huberman • 20m Deep Recovery</div>
-          <div class="track-meta">20 min</div>
+          <div>
+            <div class="track-title">Huberman • 20m Deep Recovery</div>
+            <div class="track-meta">20 min</div>
+          </div>
         </div>
         <div class="audio-actions">
           <button class="mini-btn primary" onclick="playTrack('track3')">Play</button>
@@ -508,14 +657,16 @@
           </label>
           <span class="status-tag" id="status-track3">Not linked</span>
         </div>
-        <audio id="audio-track3" controls style="width:100%; display:none; margin-top:6px;"></audio>
+        <audio id="audio-track3" controls style="display:none;"></audio>
       </div>
 
       <!-- Track 4 -->
       <div class="track-card" id="card-track4">
         <div class="track-info">
-          <div class="track-title">Jennifer Piercy • Sleep Track</div>
-          <div class="track-meta">33 min</div>
+          <div>
+            <div class="track-title">Jennifer Piercy • Sleep Track</div>
+            <div class="track-meta">33 min</div>
+          </div>
         </div>
         <div class="audio-actions">
           <button class="mini-btn primary" onclick="playTrack('track4')">Play</button>
@@ -525,7 +676,7 @@
           </label>
           <span class="status-tag" id="status-track4">Not linked</span>
         </div>
-        <audio id="audio-track4" controls style="width:100%; display:none; margin-top:6px;"></audio>
+        <audio id="audio-track4" controls style="display:none;"></audio>
       </div>
     </div>
   </section>
@@ -549,10 +700,10 @@
         <div>Long, unforced mouth sigh until lungs are completely empty.</div>
       </div>
 
-      <div style="margin-top: 18px; text-align: center;">
-        <button class="action-btn btn-primary" style="max-width: 220px;" onclick="runPacedSigh()">Guide 3 Sighs</button>
+      <div style="margin-top: 24px; text-align: center;">
+        <button class="action-btn btn-primary" style="max-width: 240px; width:100%;" onclick="runPacedSigh()">Guide 3 Sighs</button>
       </div>
-      <div id="sighFeedback" style="text-align:center; margin-top:10px; font-size:0.9rem; color:var(--sage); min-height:1.2em;"></div>
+      <div id="sighFeedback"></div>
     </div>
 
     <div class="card">
@@ -796,6 +947,7 @@
       saveJournalEntries(entries);
 
       box.value = '';
+      
       const notice = document.getElementById('saveNotice');
       notice.innerText = 'Saved privately';
       setTimeout(() => notice.innerText = '', 1800);
@@ -831,7 +983,7 @@
       updateEntryCountDisplay();
 
       if (entries.length === 0) {
-        container.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted); font-family:-apple-system, sans-serif; text-align:center; padding:10px;">No entries saved yet.</div>';
+        container.innerHTML = '<div style="font-size:0.9rem; color:var(--text-muted); text-align:center; padding:12px;">No entries saved yet.</div>';
         return;
       }
 
