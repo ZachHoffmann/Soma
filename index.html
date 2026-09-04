@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Soma">
+  <meta name="theme-color" content="#090d16">
+  <title>Soma // Daily Practice</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            somaBg: '#090d16',
+            somaCard: '#111726',
+            somaCardSubtle: '#182136',
+            somaBorder: '#1f2b47',
+            somaTeal: '#2dd4bf',
+            somaIndigo: '#818cf8',
+            somaTextMuted: '#94a3b8'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --sat: env(safe-area-inset-top, 0px);
+      --sab: env(safe-area-inset-bottom, 0px);
+    }
+    body {
+      background-color: #090d16;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      padding-top: max(1rem, var(--sat));
+      padding-bottom: max(2rem, var(--sab));
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .breath-bubble {
+      transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 4s ease;
+      will-change: transform, box-shadow;
+    }
+    .breath-inhale {
+      transform: scale(1.45);
+      box-shadow: 0 0 45px rgba(45, 212, 191, 0.45);
+    }
+    .breath-exhale {
+      transform: scale(0.85);
+      box-shadow: 0 0 15px rgba(129, 140, 248, 0.2);
+      transition-duration: 8s !important;
+      transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1) !important;
+    }
+    .glass-panel {
+      background: rgba(17, 23, 38, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid #1f2b47;
+    }
+    /* Hide scrollbars on sleek swipe lists */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen px-4 max-w-md mx-auto flex flex-col justify-between selection:bg-teal-500/20">
+
+  <header class="mb-5 pt-1">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+          <span class="inline-block w-2.5 h-2.5 rounded-full bg-teal-400 animate-pulse"></span>
+          Soma <span class="text-xs font-mono font-medium text-slate-400 tracking-wider">// PRACTICE</span>
+        </h1>
+        <p id="currentDateDisplay" class="text-xs text-somaTextMuted font-medium tracking-wide mt-0.5">Today</p>
+      </div>
+
+      <!-- Streak Badge -->
+      <div id="streakBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-2xl glass-panel border border-somaBorder cursor-pointer active:scale-95 transition-transform" onclick="toggleCheckIn()">
+        <span class="text-amber-400 text-sm">🔥</span>
+        <span id="streakCountDisplay" class="text-xs font-semibold text-slate-200">0 Days</span>
+        <span id="checkInStatusDot" class="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="grid grid-cols-4 gap-1 p-1 mb-5 rounded-2xl bg-somaCard border border-somaBorder text-xs font-medium">
+    <button onclick="switchTab('tab-breath')" id="btn-tab-breath" class="py-2 rounded-xl text-center transition-all bg-teal-500/20 text-teal-300 font-semibold shadow-sm">
+      Morning
+    </button>
+    <button onclick="switchTab('tab-audio')" id="btn-tab-audio" class="py-2 rounded-xl text-center transition-all text-slate-400 hover:text-slate-200">
+      Audio
+    </button>
+    <button onclick="switchTab('tab-acute')" id="btn-tab-acute" class="py-2 rounded-xl text-center transition-all text-slate-400 hover:text-slate-200">
+      Relief
+    </button>
+    <button onclick="switchTab('tab-journal')" id="btn-tab-journal" class="py-2 rounded-xl text-center transition-all text-slate-400 hover:text-slate-200">
+      Journal
+    </button>
+  </nav>
+
+  <!-- MAIN VIEW CONTAINER -->
+  <main class="flex-1 space-y-4">
+
+    <!-- ==================== TAB 1: MORNING BREATH & FOCUS ==================== -->
+    <section id="tab-breath" class="space-y-4">
+      <div class="glass-panel rounded-3xl p-5 border border-somaBorder relative overflow-hidden">
+        <!-- Duration Selector -->
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">1:2 Resonant Breath</span>
+          <div class="flex gap-1.5 text-xs bg-somaCardSubtle p-1 rounded-xl border border-somaBorder">
+            <button onclick="setDuration(180, this)" class="px-2.5 py-0.5 rounded-lg text-slate-400 duration-btn">3m</button>
+            <button onclick="setDuration(300, this)" class="px-2.5 py-0.5 rounded-lg text-teal-300 bg-teal-500/20 duration-btn font-semibold">5m</button>
+            <button onclick="setDuration(600, this)" class="px-2.5 py-0.5 rounded-lg text-slate-400 duration-btn">10m</button>
+          </div>
+        </div>
+
+        <!-- Breathing Visual Circle -->
+        <div class="flex flex-col items-center justify-center my-6">
+          <div class="relative flex items-center justify-center w-48 h-48">
+            <!-- Pulsing outer guide -->
+            <div id="breathGuideCircle" class="breath-bubble breath-exhale w-36 h-36 rounded-full bg-gradient-to-tr from-teal-500/20 via-indigo-500/20 to-teal-400/30 border border-teal-400/40 flex items-center justify-center">
+              <div class="w-20 h-20 rounded-full bg-somaBg/80 backdrop-blur border border-teal-300/30 flex items-center justify-center shadow-inner">
+                <span id="breathPhaseText" class="text-xs font-semibold tracking-wider text-teal-200 uppercase">Ready</span>
+              </div>
+            </div>
+          </div>
+          <div class="text-center mt-3">
+            <span id="timerDisplay" class="text-3xl font-mono font-bold tracking-tight text-white">05:00</span>
+            <p id="breathSubText" class="text-xs text-somaTextMuted mt-1">4s Belly Inhale // 8s Smooth Exhale</p>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex items-center justify-center gap-3 mt-4">
+          <button id="resetTimerBtn" onclick="resetTimer()" class="p-3 rounded-2xl bg-somaCardSubtle text-slate-300 border border-somaBorder active:scale-95 transition-all text-xs font-medium">
+            Reset
+          </button>
+          <button id="mainTimerToggleBtn" onclick="toggleTimer()" class="flex-1 max-w-[160px] py-3 px-6 rounded-2xl bg-teal-400 text-somaBg font-bold text-sm tracking-wide shadow-lg shadow-teal-500/20 active:scale-95 transition-all flex items-center justify-center gap-2">
+            <span id="toggleIcon">▶</span> <span id="toggleLabel">Begin</span>
+          </button>
+          <button onclick="playSingingBowl(432)" title="Test Bell" class="p-3 rounded-2xl bg-somaCardSubtle text-slate-300 border border-somaBorder active:scale-95 transition-all text-xs flex items-center gap-1.5">
+            <span>🔔</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Guidance Card -->
+      <div class="p-4 rounded-2xl bg-somaCard/60 border border-somaBorder/70 text-xs text-slate-300 space-y-2">
+        <div class="flex items-center gap-2 text-teal-300 font-semibold">
+          <span>💡</span> The Morning Rule
+        </div>
+        <p class="text-somaTextMuted leading-relaxed">
+          Lie flat or sit tall before phone screen time. Expand the lower belly on the 4-second inhale to decompress the gut-brain axis; prolong the exhale to 8 seconds to lower resting heart rate.
+        </p>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: AUDIO VAULT ==================== -->
+    <section id="tab-audio" class="space-y-4 hidden">
+      <div class="glass-panel rounded-3xl p-5 border border-somaBorder space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold text-white tracking-wide">Yoga Nidra & NSDR</h2>
+          <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Offline Rest</span>
+        </div>
+
+        <!-- Track Selector Preset Cards -->
+        <div class="space-y-2">
+          <!-- Huberman 10 -->
+          <div onclick="selectPreset('huberman10')" id="preset-huberman10" class="p-3 rounded-2xl bg-somaCardSubtle border border-somaBorder flex items-center justify-between cursor-pointer hover:border-teal-500/40 transition-all">
+            <div>
+              <p class="text-xs font-semibold text-slate-200">Huberman 10-Min NSDR</p>
+              <p class="text-[10px] text-somaTextMuted">Midday dopamine reset & cognitive clearing</p>
+            </div>
+            <span class="text-xs font-mono text-teal-400">10m</span>
+          </div>
+
+          <!-- Huberman 20 -->
+          <div onclick="selectPreset('huberman20')" id="preset-huberman20" class="p-3 rounded-2xl bg-somaCardSubtle border border-somaBorder flex items-center justify-between cursor-pointer hover:border-teal-500/40 transition-all">
+            <div>
+              <p class="text-xs font-semibold text-slate-200">Huberman 20-Min NSDR</p>
+              <p class="text-[10px] text-somaTextMuted">Full hypnagogic reset for deep exhaustion</p>
+            </div>
+            <span class="text-xs font-mono text-teal-400">20m</span>
+          </div>
+
+          <!-- Ally Boothroyd Sleep -->
+          <div onclick="selectPreset('allySleep')" id="preset-allySleep" class="p-3 rounded-2xl bg-somaCardSubtle border border-somaBorder flex items-center justify-between cursor-pointer hover:border-teal-500/40 transition-all">
+            <div>
+              <p class="text-xs font-semibold text-slate-200">Ally Boothroyd: Sleep Nidra</p>
+              <p class="text-[10px] text-somaTextMuted">Terminal taper into Delta slow-wave sleep</p>
+            </div>
+            <span class="text-xs font-mono text-indigo-400">45m</span>
+          </div>
+        </div>
+
+        <!-- Integrated HTML5 Audio Element -->
+        <div class="pt-2 border-t border-somaBorder space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span id="currentTrackLabel" class="text-slate-300 font-medium truncate">No track loaded</span>
+            <a id="externalStreamBtn" href="#" target="_blank" class="text-teal-400 text-[11px] underline hidden">Open Stream ↗</a>
+          </div>
+          <audio id="globalAudioPlayer" controls class="w-full h-9 rounded-xl outline-none"></audio>
+        </div>
+
+        <!-- Local File Import or Custom Stream -->
+        <div class="pt-2 space-y-2 text-xs">
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Play Local Audio From iPhone Files</label>
+          <input type="file" id="localAudioInput" accept="audio/*" class="w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-teal-500/20 file:text-teal-300 hover:file:bg-teal-500/30 cursor-pointer">
+          <p class="text-[10px] text-somaTextMuted">Tip: Download your favorite MP3 directly into your iPhone "Files" or iCloud folder and select it here for zero-buffer offline playback.</p>
+        </div>
+      </div>
+
+      <!-- Synthesized Ambient Brown Noise (Zero internet needed) -->
+      <div class="glass-panel rounded-3xl p-5 border border-somaBorder space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🌧</span>
+            <span class="text-xs font-bold text-white tracking-wide">Synthesized Brown Noise</span>
+          </div>
+          <button id="toggleNoiseBtn" onclick="toggleNoise()" class="px-3 py-1 rounded-xl bg-somaCardSubtle border border-somaBorder text-xs text-slate-300 font-semibold active:scale-95 transition-all">
+            Turn On
+          </button>
+        </div>
+        <p class="text-[11px] text-somaTextMuted">Real-time synthesized acoustic floor that masks sudden background spikes. Runs 100% offline via Web Audio.</p>
+        <div class="flex items-center gap-3 pt-1">
+          <span class="text-[10px] text-slate-400">Vol</span>
+          <input type="range" id="noiseVolumeSlider" min="0" max="0.5" step="0.01" value="0.15" oninput="setNoiseVolume(this.value)" class="w-full accent-teal-400">
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: ACUTE RELIEF PROTOCOLS ==================== -->
+    <section id="tab-acute" class="space-y-4 hidden">
+      <!-- Physiological Sigh Card -->
+      <div class="glass-panel rounded-3xl p-5 border border-somaBorder space-y-3">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold text-teal-300 flex items-center gap-2">
+            <span>⚡</span> Physiological Sigh
+          </h2>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-teal-500/20 text-teal-300">30 Seconds</span>
+        </div>
+        <p class="text-xs text-slate-300">Use when butterflies, acute panic, or hot flushes strike unexpectedly.</p>
+        
+        <div class="grid grid-cols-3 gap-2 text-center text-xs pt-1">
+          <div class="p-3 rounded-2xl bg-somaCardSubtle border border-somaBorder flex flex-col items-center">
+            <span class="text-base font-bold text-teal-300">1</span>
+            <span class="font-semibold text-slate-200 mt-1">Nose Inhale</span>
+            <span class="text-[10px] text-somaTextMuted mt-0.5">Fill 80% deep</span>
+          </div>
+          <div class="p-3 rounded-2xl bg-somaCardSubtle border border-somaBorder flex flex-col items-center">
+            <span class="text-base font-bold text-teal-300">2</span>
+            <span class="font-semibold text-slate-200 mt-1">Sharp Sip</span>
+            <span class="text-[10px] text-somaTextMuted mt-0.5">Top-off lungs</span>
+          </div>
+          <div class="p-3 rounded-2xl bg-somaCardSubtle border border-somaBorder flex flex-col items-center">
+            <span class="text-base font-bold text-indigo-300">3</span>
+            <span class="font-semibold text-slate-200 mt-1">Long Sigh</span>
+            <span class="text-[10px] text-somaTextMuted mt-0.5">Slow via mouth</span>
+          </div>
+        </div>
+
+        <button onclick="startSighCadence()" id="sighCadenceBtn" class="w-full py-2.5 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-500/30 font-semibold text-xs active:scale-95 transition-all">
+          Follow 3 Guided Sighs
+        </button>
+        <p id="sighCadenceText" class="text-center text-xs font-mono text-teal-200 hidden"></p>
+      </div>
+
+      <!-- Gut & Nausea Somatic Decompression -->
+      <div class="glass-panel rounded-3xl p-5 border border-somaBorder space-y-3">
+        <h2 class="text-sm font-bold text-indigo-300 flex items-center gap-2">
+          <span>🍃</span> Gut Tension & Nausea Protocol
+        </h2>
+        <ul class="text-xs text-slate-300 space-y-2.5 leading-relaxed">
+          <li class="flex items-start gap-2">
+            <span class="text-teal-400 font-bold">•</span>
+            <span><strong>Unclamp the Abdominal Wall:</strong> Anxiety triggers involuntary contraction of the upper rectus abdominis, crushing the celiac plexus. Deliberately soften your stomach outward like a balloon.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-teal-400 font-bold">•</span>
+            <span><strong>Tongue & Jaw Drop:</strong> Drop the tongue from the roof of your mouth and let the lower jaw hang loose. The trigeminal nerve and vagus nerve share central brainstem nuclei; softening the mouth disarms the nausea reflex.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-teal-400 font-bold">•</span>
+            <span><strong>Cold Wrist Compress:</strong> Run cool water on your inner wrists or splash your face. This stimulates the mammalian dive reflex to drop ventricular heart rate immediately.</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: JOURNAL & INTENTIONS ==================== -->
+    <section id="tab-journal" class="space-y-4 hidden">
+      <div class="glass-panel rounded-3xl p-5 border border-somaBorder space-y-3">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold text-white tracking-wide">Daily Mind & Intention Log</h2>
+          <span class="text-[10px] text-slate-400 font-mono" id="wordCountLabel">0 words</span>
+        </div>
+        <textarea id="journalInput" rows="4" placeholder="How is your body feeling right now? Note any gut tension, racing thoughts, or calm moments..." class="w-full p-3 rounded-2xl bg-somaBg/90 border border-somaBorder text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-400 transition-colors resize-none"></textarea>
+        <button onclick="saveDailyNote()" class="w-full py-2.5 rounded-xl bg-teal-400 text-somaBg font-bold text-xs active:scale-95 transition-all shadow-md shadow-teal-500/10">
+          Save Note
+        </button>
+      </div>
+
+      <!-- Past Notes History -->
+      <div class="glass-panel rounded-3xl p-5 border border-somaBorder space-y-3">
+        <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Past Entries</h3>
+        <div id="journalHistoryContainer" class="space-y-2 max-h-56 overflow-y-auto no-scrollbar text-xs">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // --- Audio Context & Sound Synthesizers ---
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    // Authentic Singing Bowl Synthesis (Pure Web Audio - No external MP3 needed)
+    function playSingingBowl(baseFreq = 432) {
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+
+        // Frequencies simulating Tibetan Singing Bowl overtones (Harmonic & Inharmonic)
+        const partials = [
+          { freq: baseFreq, gain: 0.5, decay: 6.0 },
+          { freq: baseFreq * 2.76, gain: 0.25, decay: 4.5 },
+          { freq: baseFreq * 5.4, gain: 0.15, decay: 3.0 },
+          { freq: baseFreq * 8.9, gain: 0.08, decay: 2.0 }
+        ];
+
+        partials.forEach(p => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(p.freq, now);
+
+          // Gentle strike envelope
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(p.gain, now + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + p.decay);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + p.decay);
+        });
+      } catch (err) {
+        console.warn('Web Audio playback error:', err);
+      }
+    }
+
+    // Ambient Brown Noise Generator
+    let noiseNode = null;
+    let noiseGain = null;
+    let isNoiseRunning = false;
+
+    function toggleNoise() {
+      const btn = document.getElementById('toggleNoiseBtn');
+      if (isNoiseRunning) {
+        stopNoise();
+        btn.textContent = 'Turn On';
+        btn.classList.remove('bg-teal-500/20', 'text-teal-300', 'border-teal-400/40');
+      } else {
+        startNoise();
+        btn.textContent = 'Turn Off';
+        btn.classList.add('bg-teal-500/20', 'text-teal-300', 'border-teal-400/40');
+      }
+    }
+
+    function startNoise() {
+      const ctx = getAudioContext();
+      const bufferSize = ctx.sampleRate * 2;
+      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      let lastOut = 0.0;
+
+      // Brown noise algorithm (integrated white noise)
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        output[i] = (lastOut + (0.02 * white)) / 1.02;
+        lastOut = output[i];
+        output[i] *= 3.5; // Gain boost
+      }
+
+      noiseNode = ctx.createBufferSource();
+      noiseNode.buffer = noiseBuffer;
+      noiseNode.loop = true;
+
+      noiseGain = ctx.createGain();
+      const volSlider = document.getElementById('noiseVolumeSlider');
+      noiseGain.gain.setValueAtTime(parseFloat(volSlider.value), ctx.currentTime);
+
+      noiseNode.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+      noiseNode.start();
+      isNoiseRunning = true;
+    }
+
+    function stopNoise() {
+      if (noiseNode) {
+        noiseNode.stop();
+        noiseNode.disconnect();
+        noiseNode = null;
+      }
+      isNoiseRunning = false;
+    }
+
+    function setNoiseVolume(val) {
+      if (noiseGain && audioCtx) {
+        noiseGain.gain.setValueAtTime(parseFloat(val), audioCtx.currentTime);
+      }
+    }
+
+    // --- Tab Navigation Logic ---
+    function switchTab(tabId) {
+      ['tab-breath', 'tab-audio', 'tab-acute', 'tab-journal'].forEach(id => {
+        const section = document.getElementById(id);
+        const btn = document.getElementById('btn-' + id);
+        if (id === tabId) {
+          section.classList.remove('hidden');
+          btn.className = 'py-2 rounded-xl text-center transition-all bg-teal-500/20 text-teal-300 font-semibold shadow-sm';
+        } else {
+          section.classList.add('hidden');
+          btn.className = 'py-2 rounded-xl text-center transition-all text-slate-400 hover:text-slate-200';
+        }
+      });
+    }
+
+    // --- Resonant Breathing & Countdown Timer ---
+    let selectedDuration = 300; // 5 min default
+    let remainingSeconds = 300;
+    let timerInterval = null;
+    let breathInterval = null;
+    let isRunning = false;
+    let currentBreathPhase = 'ready'; // 'inhale' (4s), 'exhale' (8s)
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(remainingSeconds / 60);
+      const seconds = remainingSeconds % 60;
+      document.getElementById('timerDisplay').textContent = 
+        `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function setDuration(seconds, buttonElement) {
+      if (isRunning) resetTimer();
+      selectedDuration = seconds;
+      remainingSeconds = seconds;
+      updateTimerDisplay();
+
+      document.querySelectorAll('.duration-btn').forEach(btn => {
+        btn.className = 'px-2.5 py-0.5 rounded-lg text-slate-400 duration-btn';
+      });
+      buttonElement.className = 'px-2.5 py-0.5 rounded-lg text-teal-300 bg-teal-500/20 duration-btn font-semibold';
+    }
+
+    function toggleTimer() {
+      if (isRunning) {
+        pauseTimer();
+      } else {
+        startTimer();
+      }
+    }
+
+    function startTimer() {
+      getAudioContext(); // Unlock audio on user interaction
+      isRunning = true;
+      document.getElementById('toggleIcon').textContent = '❚❚';
+      document.getElementById('toggleLabel').textContent = 'Pause';
+      document.getElementById('mainTimerToggleBtn').classList.replace('bg-teal-400', 'bg-indigo-400');
+
+      timerInterval = setInterval(() => {
+        remainingSeconds--;
+        updateTimerDisplay();
+        if (remainingSeconds <= 0) {
+          completeTimer();
+        }
+      }, 1000);
+
+      startBreathingCadence();
+    }
+
+    function pauseTimer() {
+      isRunning = false;
+      clearInterval(timerInterval);
+      clearInterval(breathInterval);
+      document.getElementById('toggleIcon').textContent = '▶';
+      document.getElementById('toggleLabel').textContent = 'Resume';
+      document.getElementById('mainTimerToggleBtn').classList.replace('bg-indigo-400', 'bg-teal-400');
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      remainingSeconds = selectedDuration;
+      updateTimerDisplay();
+      document.getElementById('toggleLabel').textContent = 'Begin';
+
+      const circle = document.getElementById('breathGuideCircle');
+      circle.classList.remove('breath-inhale');
+      circle.classList.add('breath-exhale');
+      document.getElementById('breathPhaseText').textContent = 'Ready';
+    }
+
+    function completeTimer() {
+      pauseTimer();
+      remainingSeconds = selectedDuration;
+      updateTimerDisplay();
+      document.getElementById('toggleLabel').textContent = 'Done';
+      playSingingBowl(432); // Play completion bell
+      recordDailyCompletion(); // Auto mark streak
+    }
+
+    function startBreathingCadence() {
+      const circle = document.getElementById('breathGuideCircle');
+      const phaseText = document.getElementById('breathPhaseText');
+
+      function doInhale() {
+        if (!isRunning) return;
+        currentBreathPhase = 'inhale';
+        phaseText.textContent = 'Inhale';
+        circle.classList.remove('breath-exhale');
+        circle.classList.add('breath-inhale');
+        circle.style.transitionDuration = '4s';
+
+        setTimeout(() => {
+          if (!isRunning) return;
+          doExhale();
+        }, 4000);
+      }
+
+      function doExhale() {
+        if (!isRunning) return;
+        currentBreathPhase = 'exhale';
+        phaseText.textContent = 'Exhale';
+        circle.classList.remove('breath-inhale');
+        circle.classList.add('breath-exhale');
+        circle.style.transitionDuration = '8s';
+
+        setTimeout(() => {
+          if (!isRunning) return;
+          doInhale();
+        }, 8000);
+      }
+
+      doInhale();
+    }
+
+    // --- Guided Physiological Sigh Rapid Tool ---
+    let sighTimer = null;
+    function startSighCadence() {
+      const label = document.getElementById('sighCadenceText');
+      const btn = document.getElementById('sighCadenceBtn');
+      label.classList.remove('hidden');
+      btn.classList.add('opacity-50', 'pointer-events-none');
+
+      let rep = 1;
+      function runRep() {
+        if (rep > 3) {
+          label.textContent = "✓ Sighed 3x — Autonomic brake applied.";
+          btn.classList.remove('opacity-50', 'pointer-events-none');
+          setTimeout(() => label.classList.add('hidden'), 4000);
+          return;
+        }
+
+        label.textContent = `[Rep ${rep}/3] Deep Inhale Nose (2s)...`;
+        setTimeout(() => {
+          label.textContent = `[Rep ${rep}/3] Sharp Sip Inhale!`;
+          setTimeout(() => {
+            label.textContent = `[Rep ${rep}/3] Long Mouth Sigh (6s)...`;
+            setTimeout(() => {
+              rep++;
+              runRep();
+            }, 6000);
+          }, 1500);
+        }, 2000);
+      }
+
+      runRep();
+    }
+
+    // --- Audio Vault Presets & Local File Player ---
+    const presets = {
+      huberman10: {
+        title: "Huberman 10-Min NSDR",
+        externalUrl: "https://www.youtube.com/results?search_query=huberman+10+minute+nsdr"
+      },
+      huberman20: {
+        title: "Huberman 20-Min NSDR",
+        externalUrl: "https://www.youtube.com/results?search_query=huberman+20+minute+nsdr"
+      },
+      allySleep: {
+        title: "Ally Boothroyd: Yoga Nidra for Sleep",
+        externalUrl: "https://www.youtube.com/results?search_query=ally+boothroyd+yoga+nidra+for+sleep"
+      }
+    };
+
+    function selectPreset(key) {
+      const p = presets[key];
+      document.getElementById('currentTrackLabel').textContent = p.title;
+      const extLink = document.getElementById('externalStreamBtn');
+      extLink.href = p.externalUrl;
+      extLink.classList.remove('hidden');
+
+      // Highlight active
+      ['huberman10', 'huberman20', 'allySleep'].forEach(k => {
+        const el = document.getElementById('preset-' + k);
+        if (k === key) {
+          el.classList.add('border-teal-400', 'bg-teal-500/10');
+        } else {
+          el.classList.remove('border-teal-400', 'bg-teal-500/10');
+        }
+      });
+    }
+
+    // Handle Local File Upload from iPhone Files
+    document.getElementById('localAudioInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        const player = document.getElementById('globalAudioPlayer');
+        player.src = url;
+        player.play();
+        document.getElementById('currentTrackLabel').textContent = `Local: ${file.name}`;
+        document.getElementById('externalStreamBtn').classList.add('hidden');
+      }
+    });
+
+    // --- Streak & Check-in Persistence ---
+    function getTodayDateString() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function initStreakTracker() {
+      const today = getTodayDateString();
+      const lastCheckIn = localStorage.getItem('soma_last_checkin');
+      let streak = parseInt(localStorage.getItem('soma_streak_count') || '0', 10);
+
+      document.getElementById('streakCountDisplay').textContent = `${streak} ${streak === 1 ? 'Day' : 'Days'}`;
+      
+      const dot = document.getElementById('checkInStatusDot');
+      if (lastCheckIn === today) {
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)]';
+      } else {
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-slate-600';
+      }
+    }
+
+    function toggleCheckIn() {
+      const today = getTodayDateString();
+      const lastCheckIn = localStorage.getItem('soma_last_checkin');
+      let streak = parseInt(localStorage.getItem('soma_streak_count') || '0', 10);
+
+      if (lastCheckIn !== today) {
+        streak++;
+        localStorage.setItem('soma_streak_count', streak);
+        localStorage.setItem('soma_last_checkin', today);
+        playSingingBowl(528); // gentle positive chime
+      }
+      initStreakTracker();
+    }
+
+    function recordDailyCompletion() {
+      const today = getTodayDateString();
+      const lastCheckIn = localStorage.getItem('soma_last_checkin');
+      if (lastCheckIn !== today) {
+        toggleCheckIn();
+      }
+    }
+
+    // --- Journal & Intentions Persistence ---
+    function saveDailyNote() {
+      const input = document.getElementById('journalInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const entries = JSON.parse(localStorage.getItem('soma_journal_entries') || '[]');
+      const newEntry = {
+        date: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+        text: text
+      };
+      entries.unshift(newEntry);
+      localStorage.setItem('soma_journal_entries', JSON.stringify(entries.slice(0, 10)));
+      input.value = '';
+      renderJournalHistory();
+    }
+
+    function renderJournalHistory() {
+      const container = document.getElementById('journalHistoryContainer');
+      const entries = JSON.parse(localStorage.getItem('soma_journal_entries') || '[]');
+      if (entries.length === 0) {
+        container.innerHTML = `<p class="text-somaTextMuted italic">No entries yet. Write your first reflection above.</p>`;
+        return;
+      }
+      container.innerHTML = entries.map(item => `
+        <div class="p-3 rounded-2xl bg-somaBg border border-somaBorder space-y-1">
+          <div class="text-[10px] text-teal-400 font-mono">${item.date}</div>
+          <p class="text-slate-200 leading-relaxed">${escapeHtml(item.text)}</p>
+        </div>
+      `).join('');
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // --- Page Initialization ---
+    window.addEventListener('DOMContentLoaded', () => {
+      // Date Display
+      const options = { weekday: 'short', month: 'short', day: 'numeric' };
+      document.getElementById('currentDateDisplay').textContent = new Date().toLocaleDateString(undefined, options);
+
+      initStreakTracker();
+      renderJournalHistory();
+      updateTimerDisplay();
+
+      // Word count handler
+      const journalInput = document.getElementById('journalInput');
+      journalInput.addEventListener('input', () => {
+        const words = journalInput.value.trim().split(/\s+/).filter(Boolean).length;
+        document.getElementById('wordCountLabel').textContent = `${words} words`;
+      });
+    });
+  </script>
+</body>
+</html>
