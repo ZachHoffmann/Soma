@@ -309,7 +309,7 @@
       touch-action: manipulation;
     }
 
-    .action-btn:active, .journal-btn:active, .mini-btn:active { 
+    .action-btn:active, .journal-btn:active { 
       transform: scale(0.96); 
     }
 
@@ -345,7 +345,7 @@
     textarea:focus { 
       outline: none; 
       border-color: var(--sage); 
-      background: var(--card);
+      background: var(--card); 
       box-shadow: inset 0 2px 6px rgba(47, 42, 36, 0.02), 0 0 0 3px var(--sage-soft); 
     }
 
@@ -386,7 +386,6 @@
       overflow-y: auto;
       padding-right: 6px;
     }
-    /* Scrollbars */
     .entries-container::-webkit-scrollbar { width: 5px; }
     .entries-container::-webkit-scrollbar-thumb { background-color: var(--card-border); border-radius: 4px; }
 
@@ -436,7 +435,7 @@
       margin-top: 14px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 10px;
       box-shadow: inset 0 2px 4px rgba(255,255,255,0.5), 0 2px 8px rgba(47, 42, 36, 0.02);
     }
     .track-info {
@@ -455,50 +454,14 @@
       font-weight: 500;
       color: var(--text-muted);
     }
-    .audio-actions {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    .mini-btn {
-      padding: 10px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--card-border);
-      background: var(--card);
-      color: var(--text);
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.15s, background-color 0.2s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 1px 3px rgba(47, 42, 36, 0.02);
-      touch-action: manipulation;
-    }
-    .mini-btn.primary { 
-      background: var(--sage); 
-      color: #fff; 
-      border: none;
-      box-shadow: 0 2px 6px rgba(107, 127, 110, 0.2);
-    }
-    
-    .status-tag {
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      margin-left: auto;
-      background: rgba(228, 222, 203, 0.4);
-      padding: 6px 10px;
-      border-radius: 8px;
-    }
     
     audio {
       width: 100%;
       height: 44px;
-      margin-top: 6px;
+      margin-top: 4px;
       border-radius: 12px;
       outline: none;
+      accent-color: var(--sage);
     }
     audio::-webkit-media-controls-panel {
       background-color: var(--sand);
@@ -540,7 +503,6 @@
     }
   </style>
 </head>
-<!-- ontouchstart ensures snappy iOS CSS :active states exist instantly -->
 <body ontouchstart="">
 
   <header>
@@ -601,82 +563,39 @@
   <section id="tab-nidra" class="tab-content">
     <div class="card">
       <div class="card-title">Yoga Nidra & NSDR Protocols</div>
-      <div class="subtext">Link your downloaded audio file once. It saves directly inside the app for offline playback.</div>
+      <div class="subtext">Tap play to stream directly. These files stay linked permanently with no setup needed.</div>
       
       <!-- Track 1 -->
-      <div class="track-card" id="card-track1">
+      <div class="track-card">
         <div class="track-info">
           <div>
             <div class="track-title">Ally Boothroyd • Sleep Descent</div>
             <div class="track-meta">45 min</div>
           </div>
         </div>
-        <div class="audio-actions">
-          <button class="mini-btn primary" onclick="playTrack('track1')">Play</button>
-          <label class="mini-btn">
-            Link File
-            <input type="file" accept="audio/*" style="display:none;" onchange="handleFileLink(event, 'track1')" />
-          </label>
-          <span class="status-tag" id="status-track1">Not linked</span>
-        </div>
-        <audio id="audio-track1" controls style="display:none;"></audio>
+        <audio controls preload="metadata" src="boothroyd-sleep.mp3"></audio>
       </div>
 
       <!-- Track 2 -->
-      <div class="track-card" id="card-track2">
+      <div class="track-card">
         <div class="track-info">
           <div>
             <div class="track-title">Huberman • 10m Daytime NSDR</div>
             <div class="track-meta">10 min</div>
           </div>
         </div>
-        <div class="audio-actions">
-          <button class="mini-btn primary" onclick="playTrack('track2')">Play</button>
-          <label class="mini-btn">
-            Link File
-            <input type="file" accept="audio/*" style="display:none;" onchange="handleFileLink(event, 'track2')" />
-          </label>
-          <span class="status-tag" id="status-track2">Not linked</span>
-        </div>
-        <audio id="audio-track2" controls style="display:none;"></audio>
+        <audio controls preload="metadata" src="huberman-10.mp3"></audio>
       </div>
 
       <!-- Track 3 -->
-      <div class="track-card" id="card-track3">
+      <div class="track-card">
         <div class="track-info">
           <div>
             <div class="track-title">Huberman • 20m Deep Recovery</div>
             <div class="track-meta">20 min</div>
           </div>
         </div>
-        <div class="audio-actions">
-          <button class="mini-btn primary" onclick="playTrack('track3')">Play</button>
-          <label class="mini-btn">
-            Link File
-            <input type="file" accept="audio/*" style="display:none;" onchange="handleFileLink(event, 'track3')" />
-          </label>
-          <span class="status-tag" id="status-track3">Not linked</span>
-        </div>
-        <audio id="audio-track3" controls style="display:none;"></audio>
-      </div>
-
-      <!-- Track 4 -->
-      <div class="track-card" id="card-track4">
-        <div class="track-info">
-          <div>
-            <div class="track-title">Jennifer Piercy • Sleep Track</div>
-            <div class="track-meta">33 min</div>
-          </div>
-        </div>
-        <div class="audio-actions">
-          <button class="mini-btn primary" onclick="playTrack('track4')">Play</button>
-          <label class="mini-btn">
-            Link File
-            <input type="file" accept="audio/*" style="display:none;" onchange="handleFileLink(event, 'track4')" />
-          </label>
-          <span class="status-tag" id="status-track4">Not linked</span>
-        </div>
-        <audio id="audio-track4" controls style="display:none;"></audio>
+        <audio controls preload="metadata" src="huberman-20.mp3"></audio>
       </div>
     </div>
   </section>
@@ -1004,119 +923,9 @@
       );
     }
 
-    // --- IndexedDB for Persistent Audio Storage ---
-    let db = null;
-    const DB_NAME = 'SomaAudioDB';
-    const DB_VERSION = 1;
-    const STORE_NAME = 'tracks';
-
-    function initDB() {
-      return new Promise((resolve, reject) => {
-        const req = indexedDB.open(DB_NAME, DB_VERSION);
-        req.onupgradeneeded = (e) => {
-          const dbInstance = e.target.result;
-          if (!dbInstance.objectStoreNames.contains(STORE_NAME)) {
-            dbInstance.createObjectStore(STORE_NAME);
-          }
-        };
-        req.onsuccess = (e) => {
-          db = e.target.result;
-          resolve(db);
-        };
-        req.onerror = (e) => reject(e);
-      });
-    }
-
-    async function saveTrackBlob(trackId, fileBlob) {
-      if (!db) await initDB();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE_NAME, 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        store.put(fileBlob, trackId);
-        tx.oncomplete = () => resolve();
-        tx.onerror = (e) => reject(e);
-      });
-    }
-
-    async function getTrackBlob(trackId) {
-      if (!db) await initDB();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE_NAME, 'readonly');
-        const store = tx.objectStore(STORE_NAME);
-        const req = store.get(trackId);
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = (e) => reject(e);
-      });
-    }
-
-    async function handleFileLink(event, trackId) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const statusEl = document.getElementById('status-' + trackId);
-      statusEl.innerText = 'Saving...';
-
-      try {
-        await saveTrackBlob(trackId, file);
-        statusEl.innerText = 'Linked & Ready';
-        statusEl.style.color = 'var(--sage)';
-        attachAudioSource(trackId, file);
-      } catch (err) {
-        console.error(err);
-        statusEl.innerText = 'Save failed';
-      }
-    }
-
-    function attachAudioSource(trackId, blob) {
-      const audioEl = document.getElementById('audio-' + trackId);
-      audioEl.src = URL.createObjectURL(blob);
-      audioEl.style.display = 'block';
-    }
-
-    async function playTrack(trackId) {
-      const audioEl = document.getElementById('audio-' + trackId);
-      if (!audioEl.src || audioEl.src === window.location.href) {
-        const blob = await getTrackBlob(trackId);
-        if (blob) {
-          attachAudioSource(trackId, blob);
-          audioEl.play();
-        } else {
-          alert('Tap "Link File" first to choose the audio file from your phone once.');
-        }
-      } else {
-        if (audioEl.paused) {
-          audioEl.play();
-        } else {
-          audioEl.pause();
-        }
-      }
-    }
-
-    async function checkSavedTracks() {
-      const tracks = ['track1', 'track2', 'track3', 'track4'];
-      for (const t of tracks) {
-        const blob = await getTrackBlob(t);
-        const statusEl = document.getElementById('status-' + t);
-        if (blob) {
-          statusEl.innerText = 'Linked & Ready';
-          statusEl.style.color = 'var(--sage)';
-          attachAudioSource(t, blob);
-        } else {
-          statusEl.innerText = 'Not linked';
-        }
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', async () => {
+    window.addEventListener('DOMContentLoaded', () => {
       updateDisplay();
       updateEntryCountDisplay();
-
-      try {
-        await initDB();
-        await checkSavedTracks();
-      } catch (e) {
-        console.error('DB init failed', e);
-      }
     });
   </script>
 </body>
