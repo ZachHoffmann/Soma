@@ -248,11 +248,12 @@
       font-size: 0.85rem;
       color: var(--text-muted);
       font-weight: 500;
-      min-width: 90px;
+      flex-shrink: 0;
     }
 
     .slider {
       flex: 1;
+      min-width: 80px;
       -webkit-appearance: none;
       background: transparent;
       height: 24px; 
@@ -281,7 +282,8 @@
     }
 
     .num-input {
-      width: 48px;
+      width: 46px;
+      flex-shrink: 0;
       padding: 6px 4px;
       border-radius: var(--radius-sm);
       border: 1px solid var(--card-border);
@@ -556,17 +558,15 @@
       </div>
 
       <div class="time-selector">
-        <label for="p1Slider">Breath Time:</label>
+        <label for="p1Slider">Breath (min):</label>
         <input type="range" id="p1Slider" class="slider" min="1" max="30" value="5" oninput="syncPhase1(this.value)" />
         <input type="number" id="p1Box" class="num-input" min="1" max="30" value="5" oninput="syncPhase1(this.value)" />
-        <span style="font-size:0.85rem; color:var(--text-muted); font-weight:500;">min</span>
       </div>
 
       <div class="time-selector">
-        <label for="p2Slider">Focus Time:</label>
+        <label for="p2Slider">Focus (min):</label>
         <input type="range" id="p2Slider" class="slider" min="1" max="30" value="5" oninput="syncPhase2(this.value)" />
         <input type="number" id="p2Box" class="num-input" min="1" max="30" value="5" oninput="syncPhase2(this.value)" />
-        <span style="font-size:0.85rem; color:var(--text-muted); font-weight:500;">min</span>
       </div>
 
       <div class="time-selector">
@@ -692,7 +692,7 @@
     // Timer & Sequence State
     let phase1Seconds = 300;
     let phase2Seconds = 300;
-    let currentPhase = 1; // 1 = Breath Grounding, 2 = Attentional Focus
+    let currentPhase = 1;
     let remainingSeconds = 300;
     let isRunning = false;
     let timerInterval = null;
@@ -773,7 +773,6 @@
       playTransitionChime();
 
       if (currentPhase === 1) {
-        // Move to Phase 2: Focus
         currentPhase = 2;
         remainingSeconds = phase2Seconds;
         document.getElementById('phaseBadge').innerText = 'Phase 2: Attentional Focus';
@@ -782,7 +781,6 @@
         document.getElementById('breathRing').style.transition = 'transform 2s ease';
         updateDisplay();
         
-        // Auto-resume for phase 2
         isRunning = true;
         document.getElementById('startBtn').innerText = 'Pause';
         startAmbientToneIfNeeded();
@@ -853,7 +851,6 @@
       }, 4000);
     }
 
-    // Phase 2 Ambient Tone Generator
     function startAmbientToneIfNeeded() {
       if (currentPhase !== 2) return;
       const toggleVal = document.getElementById('focusAudioToggle').value;
@@ -865,18 +862,17 @@
         const now = audioCtx.currentTime;
         ambientGain = audioCtx.createGain();
         ambientGain.gain.setValueAtTime(0.0001, now);
-        ambientGain.gain.exponentialRampToValueAtTime(0.08, now + 3.0); // very soft warm drone
+        ambientGain.gain.exponentialRampToValueAtTime(0.08, now + 3.0);
         ambientGain.connect(audioCtx.destination);
 
-        // Soft calming interval frequencies (e.g. root and fifth/octave low hum)
         ambientOsc1 = audioCtx.createOscillator();
         ambientOsc2 = audioCtx.createOscillator();
 
         ambientOsc1.type = 'sine';
         ambientOsc2.type = 'triangle';
 
-        ambientOsc1.frequency.setValueAtTime(108, now); // A2 approx low hum
-        ambientOsc2.frequency.setValueAtTime(162, now); // E3 harmonic blend
+        ambientOsc1.frequency.setValueAtTime(108, now);
+        ambientOsc2.frequency.setValueAtTime(162, now);
 
         ambientOsc1.connect(ambientGain);
         ambientOsc2.connect(ambientGain);
@@ -904,7 +900,6 @@
       }
     }
 
-    // Soft Harmonic Singing Bowl Chime for Phase Transitions
     function playTransitionChime() {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
