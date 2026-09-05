@@ -62,7 +62,7 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
-    input, textarea, button {
+    input, textarea, button, select {
       font-family: inherit;
     }
 
@@ -217,23 +217,38 @@
       transition: opacity 0.3s ease;
     }
 
+    .phase-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      background: var(--bg);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--card-border);
+    }
+
     /* --- Controls & Inputs --- */
     .time-selector {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin: 16px 0 24px;
+      margin: 12px 0;
       background: var(--bg);
-      padding: 12px 16px;
+      padding: 10px 14px;
       border-radius: var(--radius-md);
       border: 1px solid var(--card-border);
       box-shadow: inset 0 2px 6px rgba(47, 42, 36, 0.02);
     }
 
     .time-selector label {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--text-muted);
       font-weight: 500;
+      min-width: 90px;
     }
 
     .slider {
@@ -251,11 +266,11 @@
     }
     .slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      height: 24px;
-      width: 24px;
+      height: 22px;
+      width: 22px;
       border-radius: 50%;
       background: var(--sage);
-      margin-top: -9px;
+      margin-top: -8px;
       box-shadow: 0 2px 6px rgba(107, 127, 110, 0.3), inset 0 1px 2px rgba(255,255,255,0.2);
       border: 1px solid var(--sage-dark);
       cursor: pointer;
@@ -266,8 +281,8 @@
     }
 
     .num-input {
-      width: 52px;
-      padding: 8px 4px;
+      width: 48px;
+      padding: 6px 4px;
       border-radius: var(--radius-sm);
       border: 1px solid var(--card-border);
       background: var(--card);
@@ -291,10 +306,28 @@
       background: var(--bg);
     }
 
+    .select-input {
+      flex: 1;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--card-border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 500;
+      outline: none;
+      box-shadow: inset 0 2px 4px rgba(47, 42, 36, 0.02);
+    }
+    .select-input:focus {
+      border-color: var(--sage);
+      background: var(--bg);
+    }
+
     /* --- Buttons --- */
     .btn-row {
       display: flex;
       gap: 12px;
+      margin-top: 20px;
     }
 
     .action-btn {
@@ -510,10 +543,11 @@
   <!-- TAB 1: DAILY MEDITATION -->
   <main id="tab-daily" class="tab-content active">
     <div class="card">
-      <div class="card-title">Morning Grounding</div>
-      <div class="subtext">4s nasal inhale (expand belly) • 8s gentle nasal exhale. Clears visceral stomach tension and calms racing thoughts.</div>
+      <div class="card-title">Morning Practice Protocol</div>
+      <div class="subtext">Sequential flow: Phase 1 regulates arousal via breathwork; Phase 2 trains attentional focus and anchoring.</div>
 
       <div class="visualizer-box">
+        <div id="phaseBadge" class="phase-badge">Phase 1: Breath Grounding</div>
         <div class="circle-wrap">
           <div id="breathRing" class="breath-ring"></div>
           <div id="timerDisplay" class="timer-readout">05:00</div>
@@ -522,10 +556,25 @@
       </div>
 
       <div class="time-selector">
-        <label for="timeSlider">Duration:</label>
-        <input type="range" id="timeSlider" class="slider" min="1" max="60" value="5" oninput="syncTimer(this.value)" />
-        <input type="number" id="timeBox" class="num-input" min="1" max="60" value="5" oninput="syncTimer(this.value)" />
+        <label for="p1Slider">Breath Time:</label>
+        <input type="range" id="p1Slider" class="slider" min="1" max="30" value="5" oninput="syncPhase1(this.value)" />
+        <input type="number" id="p1Box" class="num-input" min="1" max="30" value="5" oninput="syncPhase1(this.value)" />
         <span style="font-size:0.85rem; color:var(--text-muted); font-weight:500;">min</span>
+      </div>
+
+      <div class="time-selector">
+        <label for="p2Slider">Focus Time:</label>
+        <input type="range" id="p2Slider" class="slider" min="1" max="30" value="5" oninput="syncPhase2(this.value)" />
+        <input type="number" id="p2Box" class="num-input" min="1" max="30" value="5" oninput="syncPhase2(this.value)" />
+        <span style="font-size:0.85rem; color:var(--text-muted); font-weight:500;">min</span>
+      </div>
+
+      <div class="time-selector">
+        <label for="focusAudioToggle">Phase 2 Audio:</label>
+        <select id="focusAudioToggle" class="select-input">
+          <option value="tone">Ambient Tone</option>
+          <option value="silence">Silence</option>
+        </select>
       </div>
 
       <div class="btn-row">
@@ -640,22 +689,41 @@
       btn.classList.add('active');
     }
 
-    // Timer & Breath State
-    let totalSeconds = 300;
+    // Timer & Sequence State
+    let phase1Seconds = 300;
+    let phase2Seconds = 300;
+    let currentPhase = 1; // 1 = Breath Grounding, 2 = Attentional Focus
     let remainingSeconds = 300;
     let isRunning = false;
     let timerInterval = null;
     let cycleInterval = null;
     let audioCtx = null;
+    let ambientOsc1 = null;
+    let ambientOsc2 = null;
+    let ambientGain = null;
 
-    function syncTimer(val) {
+    function syncPhase1(val) {
       if (isRunning) return;
-      val = Math.max(1, Math.min(60, parseInt(val) || 1));
-      document.getElementById('timeSlider').value = val;
-      document.getElementById('timeBox').value = val;
-      totalSeconds = val * 60;
-      remainingSeconds = totalSeconds;
-      updateDisplay();
+      val = Math.max(1, Math.min(30, parseInt(val) || 1));
+      document.getElementById('p1Slider').value = val;
+      document.getElementById('p1Box').value = val;
+      phase1Seconds = val * 60;
+      if (currentPhase === 1) {
+        remainingSeconds = phase1Seconds;
+        updateDisplay();
+      }
+    }
+
+    function syncPhase2(val) {
+      if (isRunning) return;
+      val = Math.max(1, Math.min(30, parseInt(val) || 1));
+      document.getElementById('p2Slider').value = val;
+      document.getElementById('p2Box').value = val;
+      phase2Seconds = val * 60;
+      if (currentPhase === 2) {
+        remainingSeconds = phase2Seconds;
+        updateDisplay();
+      }
     }
 
     function updateDisplay() {
@@ -680,38 +748,96 @@
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
 
-      runBreathAnimation();
-      cycleInterval = setInterval(runBreathAnimation, 12000);
+      if (currentPhase === 1) {
+        runBreathAnimation();
+        cycleInterval = setInterval(runBreathAnimation, 12000);
+      } else {
+        startAmbientToneIfNeeded();
+      }
 
       timerInterval = setInterval(() => {
         remainingSeconds--;
         updateDisplay();
         if (remainingSeconds <= 0) {
-          finishTimer();
+          transitionPhase();
         }
       }, 1000);
     }
 
-    function pauseTimer() {
+    function transitionPhase() {
+      pauseTimerWithoutReset();
+      playTransitionChime();
+
+      if (currentPhase === 1) {
+        // Move to Phase 2: Focus
+        currentPhase = 2;
+        remainingSeconds = phase2Seconds;
+        document.getElementById('phaseBadge').innerText = 'Phase 2: Attentional Focus';
+        document.getElementById('cueText').innerText = 'Anchor attention. When mind wanders, gently return.';
+        document.getElementById('breathRing').style.transform = 'scale(1.1)';
+        document.getElementById('breathRing').style.transition = 'transform 2s ease';
+        updateDisplay();
+        
+        // Auto-resume for phase 2
+        isRunning = true;
+        document.getElementById('startBtn').innerText = 'Pause';
+        startAmbientToneIfNeeded();
+
+        timerInterval = setInterval(() => {
+          remainingSeconds--;
+          updateDisplay();
+          if (remainingSeconds <= 0) {
+            finishSession();
+          }
+        }, 1000);
+
+      } else {
+        finishSession();
+      }
+    }
+
+    function finishSession() {
+      pauseTimer();
+      currentPhase = 1;
+      remainingSeconds = phase1Seconds;
+      document.getElementById('phaseBadge').innerText = 'Phase 1: Breath Grounding';
+      document.getElementById('cueText').innerText = 'Session Complete';
+      updateDisplay();
+      document.getElementById('startBtn').innerText = 'Begin';
+    }
+
+    function pauseTimerWithoutReset() {
       isRunning = false;
-      document.getElementById('startBtn').innerText = 'Resume';
       clearInterval(timerInterval);
       clearInterval(cycleInterval);
+      stopAmbientTone();
+    }
+
+    function pauseTimer() {
+      pauseTimerWithoutReset();
+      document.getElementById('startBtn').innerText = 'Resume';
       document.getElementById('breathRing').style.transition = 'transform 0.5s ease';
       document.getElementById('breathRing').style.transform = 'scale(1)';
       document.getElementById('cueText').innerText = 'Paused';
     }
 
     function resetTimer() {
-      pauseTimer();
-      remainingSeconds = totalSeconds;
+      pauseTimerWithoutReset();
+      currentPhase = 1;
+      remainingSeconds = phase1Seconds;
+      document.getElementById('phaseBadge').innerText = 'Phase 1: Breath Grounding';
       updateDisplay();
       document.getElementById('startBtn').innerText = 'Begin';
       document.getElementById('cueText').innerText = 'Ready to begin';
+      document.getElementById('breathRing').style.transform = 'scale(1)';
     }
 
     function runBreathAnimation() {
+      if (currentPhase !== 1) return;
       const ring = document.getElementById('breathRing');
       const cue = document.getElementById('cueText');
       
@@ -720,24 +846,66 @@
       ring.style.transform = 'scale(1.4)';
 
       setTimeout(() => {
-        if (!isRunning) return;
+        if (!isRunning || currentPhase !== 1) return;
         cue.innerText = 'Exhale softly (Belly falls)';
         ring.style.transition = 'transform 8s ease-in-out';
         ring.style.transform = 'scale(1)';
       }, 4000);
     }
 
-    function finishTimer() {
-      pauseTimer();
-      document.getElementById('cueText').innerText = 'Session Complete';
-      playHarmonicBowl();
-      remainingSeconds = totalSeconds;
-      updateDisplay();
-      document.getElementById('startBtn').innerText = 'Begin';
+    // Phase 2 Ambient Tone Generator
+    function startAmbientToneIfNeeded() {
+      if (currentPhase !== 2) return;
+      const toggleVal = document.getElementById('focusAudioToggle').value;
+      if (toggleVal !== 'tone') return;
+
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        const now = audioCtx.currentTime;
+        ambientGain = audioCtx.createGain();
+        ambientGain.gain.setValueAtTime(0.0001, now);
+        ambientGain.gain.exponentialRampToValueAtTime(0.08, now + 3.0); // very soft warm drone
+        ambientGain.connect(audioCtx.destination);
+
+        // Soft calming interval frequencies (e.g. root and fifth/octave low hum)
+        ambientOsc1 = audioCtx.createOscillator();
+        ambientOsc2 = audioCtx.createOscillator();
+
+        ambientOsc1.type = 'sine';
+        ambientOsc2.type = 'triangle';
+
+        ambientOsc1.frequency.setValueAtTime(108, now); // A2 approx low hum
+        ambientOsc2.frequency.setValueAtTime(162, now); // E3 harmonic blend
+
+        ambientOsc1.connect(ambientGain);
+        ambientOsc2.connect(ambientGain);
+
+        ambientOsc1.start(now);
+        ambientOsc2.start(now);
+      } catch (e) {
+        console.error('Ambient tone error', e);
+      }
     }
 
-    // Soft Harmonic Singing Bowl
-    function playHarmonicBowl() {
+    function stopAmbientTone() {
+      if (ambientGain && audioCtx) {
+        try {
+          const now = audioCtx.currentTime;
+          ambientGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.5);
+          setTimeout(() => {
+            if (ambientOsc1) { ambientOsc1.stop(); ambientOsc1.disconnect(); ambientOsc1 = null; }
+            if (ambientOsc2) { ambientOsc2.stop(); ambientOsc2.disconnect(); ambientOsc2 = null; }
+            if (ambientGain) { ambientGain.disconnect(); ambientGain = null; }
+          }, 1600);
+        } catch (e) {
+          // ignore cleanup race conditions
+        }
+      }
+    }
+
+    // Soft Harmonic Singing Bowl Chime for Phase Transitions
+    function playTransitionChime() {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -748,8 +916,8 @@
         const masterGain = audioCtx.createGain();
 
         masterGain.gain.setValueAtTime(0.0001, now);
-        masterGain.gain.exponentialRampToValueAtTime(0.18, now + 2.5);
-        masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 8.5);
+        masterGain.gain.exponentialRampToValueAtTime(0.18, now + 2.0);
+        masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 7.5);
         masterGain.connect(audioCtx.destination);
 
         harmonics.forEach((h, idx) => {
@@ -761,7 +929,7 @@
           osc.connect(gain);
           gain.connect(masterGain);
           osc.start(now);
-          osc.stop(now + 9.0);
+          osc.stop(now + 8.0);
         });
       } catch (e) {
         console.error('Audio playback error', e);
